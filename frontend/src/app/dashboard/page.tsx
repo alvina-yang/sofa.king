@@ -41,23 +41,23 @@ export default function Dashboard() {
         data: categoryValues,
         backgroundColor: colors,
         borderWidth: 0,
-        cutout: '70%', // Adjusted cutout size to make the chart larger
+        cutout: '70%', 
       },
     ],
   };
 
   // State to control animation of progress bars
   const [filledWidths, setFilledWidths] = useState(
-    Object.values(categories).map(() => "0%") // Start with all widths at 0%
+    Object.values(categories).map(() => "0%") 
   );
 
   useEffect(() => {
     // Animate the progress bars after component mounts
     const timeoutId = setTimeout(() => {
       setFilledWidths(Object.values(categories).map((percentage) => `${percentage * 100}%`));
-    }, 200); // Delay for a smoother effect
+    }, 100); 
 
-    return () => clearTimeout(timeoutId); // Cleanup timeout on unmount
+    return () => clearTimeout(timeoutId); // Cleanup timeout
   }, []);
 
   return (

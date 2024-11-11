@@ -17,26 +17,25 @@ import {
 import Link from "next/link";
 import { useRef, useState } from "react";
 
-// Define links here with updated icons
 const links = [
   {
     title: "Home",
-    icon: <IconHome2 className="h-full w-full text-zinc-200 dark:text-zinc-300" />, // Updated Home icon
+    icon: <IconHome2 className="h-full w-full text-zinc-200 dark:text-zinc-300" />, 
     href: "/dashboard",
   },
   {
     title: "Accounts",
-    icon: <IconWallet className="h-full w-full text-zinc-200 dark:text-zinc-300" />, // Updated Accounts icon
+    icon: <IconWallet className="h-full w-full text-zinc-200 dark:text-zinc-300" />, 
     href: "/accounts",
   },
   {
     title: "Budgets",
-    icon: <IconCash className="h-full w-full text-zinc-200 dark:text-zinc-300" />, // Updated Budgets icon
+    icon: <IconCash className="h-full w-full text-zinc-200 dark:text-zinc-300" />, 
     href: "/budgets",
   },
   {
     title: "Help",
-    icon: <IconHelp className="h-full w-full text-zinc-200 dark:text-zinc-300" />, // Updated Help icon
+    icon: <IconHelp className="h-full w-full text-zinc-200 dark:text-zinc-300" />, 
     href: "/help",
   },
 ];
@@ -67,7 +66,7 @@ const FloatingDockMobile = ({
   return (
     <div
       className={cn(
-        "fixed bottom-4 right-4 z-50 block md:hidden", // Position fixed at bottom-right
+        "fixed bottom-4 right-4 z-50 block md:hidden", 
         className
       )}
     >
