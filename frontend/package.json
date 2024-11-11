@@ -9,10 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.6.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "@tabler/icons-react": "^3.21.0",
+    "chart.js": "^4.4.6",
     "clsx": "^2.1.1",
     "framer-motion": "^11.11.10",
     "next": "15.0.1",
     "react": "19.0.0-rc-69d4b800-20241021",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "19.0.0-rc-69d4b800-20241021",
     "tailwind-merge": "^2.5.4"
   },
