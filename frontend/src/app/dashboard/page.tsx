@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client'; 
 
 import { Pie } from 'react-chartjs-2';
@@ -76,9 +77,9 @@ export default function Dashboard() {
           <div className="mt-6 mb-6 flex justify-center"> 
             <div className="w-full max-w-md"> 
               <Pie data={data} />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center mt-5 text-white">
-                  <p className="text-base font-semibold">Budget Spent</p> 
+              <div className="absolute inset-0 mt-5 flex items-center justify-center">
+                <div className="text-center mt-8 text-white">
+                  <p className="text-base mt-8 font-semibold">Budget Spent</p> 
                   <p className="text-5xl font-bold">${budgetSpent.toFixed(2)}</p> 
                   <p>out of ${budgetTotal.toFixed(2)}</p>
                 </div>
@@ -93,7 +94,7 @@ export default function Dashboard() {
           {Object.entries(categories).map(([category, percentage], index) => (
             <div key={index} className="mb-4 mt-5"> 
               <p className="text-white text-sm">{category} - {(percentage * 100).toFixed(0)}% of total spending</p> {/* Adjusted text size */}
-              <div className="w-full bg-zinc-800 rounded-full h-4"> {/* Adjusted height */}
+              <div className="w-full bg-zinc-800 rounded-full h-4"> 
                 <div
                   className="h-full mt-6 rounded-full transition-all duration-1000" 
                   style={{
