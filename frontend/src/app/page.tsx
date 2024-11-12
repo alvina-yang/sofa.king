@@ -1,12 +1,15 @@
 "use client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-
 export default function Home() {
   const router = useRouter();
 
   const goToLogin = () => {
     router.push("/login");
+  };
+
+  const goToSignUp = () => {
+    router.push("/sign-up");
   };
 
   return (
@@ -33,6 +36,12 @@ export default function Home() {
           >
             Login
           </button>
+          <button
+            onClick={goToSignUp}
+            className="hover:underline hover:underline-offset-4 text-sm sm:text-base cursor-pointer"
+          >
+            Sign Up
+          </button>
         </nav>
       </header>
 
@@ -56,6 +65,12 @@ export default function Home() {
               className="rounded-full border border-solid border-gray-300 text-gray-700 px-6 py-3 text-sm sm:text-base hover:bg-gray-100 transition-colors"
             >
               Login
+            </button>
+            <button
+              onClick={goToSignUp}
+              className="rounded-full border border-solid border-gray-300 text-gray-700 px-6 py-3 text-sm sm:text-base hover:bg-gray-100 transition-colors"
+            >
+              Sign Up
             </button>
           </div>
         </section>
