@@ -31,7 +31,7 @@ export default function SignUp() {
     }));
   };
 
-  const handleSignUp = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match.");
@@ -41,8 +41,33 @@ export default function SignUp() {
       setError("You must agree to the terms and conditions.");
       return;
     }
-    console.log("Sign up data:", formData); // no backend LOL
-    router.push("/dashboard");
+
+    try {
+      // Send form data to the backend
+      const response = await fetch("http://localhost:5000/api/user-data", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          monthlyBudget: formData.monthlyBudget,
+          shortTermGoal: formData.shortTermGoal,
+          longTermGoal: formData.longTermGoal,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("User data saved:", data);
+        router.push("/dashboard");
+      } else {
+        setError(data.error || "An error occurred while signing up.");
+      }
+    } catch (error) {
+      console.error("Sign-up error:", error);
+      setError("An error occurred while signing up.");
+    }
   };
 
   if (!isClient) return null;
