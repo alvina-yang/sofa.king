@@ -8,6 +8,7 @@ export default function SignUp() {
     password: "",
     confirmPassword: "",
     preferredCurrency: "",
+    monthlyBudget: "",
     shortTermGoal: "",
     shortTermTimeframe: "",
     longTermGoal: "",
@@ -111,11 +112,27 @@ export default function SignUp() {
             required
           >
             <option value="">Select currency</option>
+            <option value="CAD">CAD</option>
             <option value="USD">USD</option>
             <option value="EUR">EUR</option>
             <option value="GBP">GBP</option>
             <option value="JPY">JPY</option>
           </select>
+        </div>
+        <div className="mb-4">
+          <label htmlFor="monthlyBudget" className="block text-white text-sm font-bold mb-2">
+            Monthly Budget
+          </label>
+          <input
+            id="monthlyBudget"
+            name="monthlyBudget"
+            type="number"
+            value={formData.monthlyBudget}
+            onChange={handleChange}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-black bg-gray-200 leading-tight focus:outline-none focus:shadow-outline"
+            placeholder="Enter your monthly budget"
+            required
+          />
         </div>
         <div className="mb-4">
           <label htmlFor="shortTermGoal" className="block text-white text-sm font-bold mb-2">

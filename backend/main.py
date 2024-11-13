@@ -3,7 +3,6 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from csv_loader import load_csv_data
 from ollama_processor import process_transactions
-import json
 
 app = Flask(__name__)
 CORS(app)
