@@ -1,3 +1,4 @@
+
 # sofa.king
 
 # Project Setup
@@ -31,25 +32,40 @@
    cd backend
    ```
 
-2. Install Python dependencies:
+2. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   ```
+
+3. Activate the virtual environment:
+   - On Windows:
+     ```bash
+     venv\Scripts\activate
+     ```
+   - On macOS and Linux:
+     ```bash
+     source venv/bin/activate
+     ```
+
+4. Install the required packages:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Install Ollama:
-   Follow the installation instructions for Ollama from their official website.
+5. Install Ollama:
+   Follow the instructions at [Ollama's official website](https://ollama.ai/download) to install Ollama for your operating system.
 
-4. Pull the Llama 3.1 model:
+6. Pull the Llama 3.1 model:
    ```bash
    ollama pull llama3.1
    ```
 
-5. Start the Ollama server:
+7. Start the Ollama server:
    ```bash
    ollama serve
    ```
 
-6. Run the Python backend:
+8. Run the Python backend:
    ```bash
    python main.py
    ```
