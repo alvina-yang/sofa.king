@@ -33,6 +33,7 @@ def transaction_analysis():
     except ValueError as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route('/api/user-data', methods=['POST'])
 def user_data_route():
     try:
@@ -40,26 +41,31 @@ def user_data_route():
         monthly_budget = float(data.get("monthlyBudget"))
         short_term_goal = data.get("shortTermGoal")
         long_term_goal = data.get("longTermGoal")
+
         # Store the data
         user_data['monthlyBudget'] = monthly_budget
         user_data['shortTermGoal'] = short_term_goal
         user_data['longTermGoal'] = long_term_goal
-        # Load transactions and calculate total_amount
+
+        # Load transactions
         transactions = load_csv_data('data/transactions.csv')
+        user_data['transactions'] = transactions
+
+        # Process transactions
         results = process_transactions(transactions)
         total_amount = results['total']
+        categories = results['categories']
+
         # Generate goal message
         message = generate_goal_message(monthly_budget, total_amount, short_term_goal)
         user_data['goalMessage'] = message
         user_data['totalSpent'] = total_amount
+        user_data['categories'] = {category: (amount / total_amount) for category, amount in categories.items()}
+
         # Prepare response
         response_data = {
             "message": "User data received successfully",
-            "monthlyBudget": monthly_budget,
-            "shortTermGoal": short_term_goal,
-            "longTermGoal": long_term_goal,
-            "goalMessage": message,
-            "totalSpent": total_amount
+            **user_data
         }
         return jsonify(response_data), 200
     except Exception as e:
@@ -71,6 +77,7 @@ def get_user_data():
         return jsonify(user_data), 200
     else:
         return jsonify({"error": "No user data available"}), 404
+
 
 if __name__ == "__main__":
     app.run(debug=True)

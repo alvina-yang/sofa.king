@@ -14,12 +14,15 @@ def generate_goal_message(monthly_budget, total_amount, short_term_goal):
 
     prompt_text = f"""
     Imagine the user has a goal: '{short_term_goal}'. Write a motivational and friendly message to encourage them.
-    The message should be creative and inspiring, showing how close they are to achieving their goal with just ${remaining:.2f} more to save.
+    The message should be creative, showing how close they are to achieving their goal with just ${remaining:.2f} more to save.
 
     Examples:
-    - "Keep going! Just ${remaining:.2f} more and you'll be driving your dream car!"
+    - "Just ${remaining:.2f} more and you'll be driving your dream car!"
     - "Only ${remaining:.2f} left before you're enjoying your new adventure!"
     - "You're so close to {short_term_goal}! Keep it up!"
+
+    IMPORTANT:
+    - If the goal is innapropriate, say "You're so close to {short_term_goal}! Keep it up!" or another general message
 
     Provide the message only, without any extra characters or quotes.
     """
