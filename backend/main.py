@@ -77,6 +77,72 @@ def get_user_data():
         return jsonify(user_data), 200
     else:
         return jsonify({"error": "No user data available"}), 404
+    
+@app.route('/api/add-transaction', methods=['POST'])
+def add_transaction():
+    try:
+        # Parse incoming JSON data
+        data = request.get_json()
+        amount = float(data.get("amount"))
+        date = data.get("date")  # Expected format: "YYYY-MM-DD"
+        merchant = data.get("merchant")
+
+        # Validate required fields
+        if not amount or not date or not merchant:
+            return jsonify({"error": "Missing required fields: 'amount', 'date', or 'merchant'"}), 400
+
+        # Ensure transactions exist in user_data
+        if "transactions" not in user_data:
+            user_data["transactions"] = []
+
+        # Add the new transaction to the list
+        transaction = {
+            "amount": amount,
+            "date": date,
+            "merchant": merchant
+        }
+        user_data["transactions"].append(transaction)
+
+        # Process all transactions using process_transactions
+        processed_results = process_transactions(user_data["transactions"])
+
+        # Extract processed totals and categories
+        total_amount = processed_results["total"]
+        categories = processed_results["categories"]
+
+        # Update user_data
+        user_data["totalSpent"] = total_amount
+        user_data["categories"] = {
+            category: (amount / total_amount if total_amount > 0 else 0)
+            for category, amount in categories.items()
+        }
+
+        # Prepare and return the response
+        return jsonify({
+            "message": "Transaction added successfully",
+            "totalSpent": user_data["totalSpent"],
+            "categories": user_data["categories"],
+            "transactions": user_data["transactions"]
+        }), 200
+
+    except ValueError as ve:
+        return jsonify({"error": f"Invalid data: {ve}"}), 400
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+
+@app.route('/api/view-user-data', methods=['GET'])
+def view_user_data():
+    """
+    Endpoint to view the entire user_data object.
+    """
+    try:
+        if user_data:
+            return jsonify(user_data), 200
+        else:
+            return jsonify({"error": "No user data available"}), 404
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 
 if __name__ == "__main__":
