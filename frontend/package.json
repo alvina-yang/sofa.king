@@ -12,15 +12,20 @@
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@radix-ui/react-slot": "^1.1.0",
     "@tabler/icons-react": "^3.21.0",
     "chart.js": "^4.4.6",
+    "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.11.10",
+    "lucide-react": "^0.460.0",
     "next": "15.0.1",
     "react": "19.0.0-rc-69d4b800-20241021",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "19.0.0-rc-69d4b800-20241021",
-    "tailwind-merge": "^2.5.4"
+    "recharts": "^2.13.3",
+    "tailwind-merge": "^2.5.4",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "^20",

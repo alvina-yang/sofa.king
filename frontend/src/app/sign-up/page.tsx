@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useGlobalState } from "../context/GlobalState";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -18,6 +19,8 @@ export default function SignUp() {
   const [error, setError] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
+  const { setBudgetTotal, setGoalMessage, setBudgetSpent, setCategories, setTransactions } =
+    useGlobalState();
 
   useEffect(() => {
     setIsClient(true);
@@ -25,9 +28,9 @@ export default function SignUp() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+      [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
@@ -43,8 +46,7 @@ export default function SignUp() {
     }
 
     try {
-      // Send form data to the backend
-      const response = await fetch("http://localhost:5000/api/user-data", {
+      const response = await fetch("http://127.0.0.1:5000/api/user-data", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +61,11 @@ export default function SignUp() {
       const data = await response.json();
 
       if (response.ok) {
-        console.log("User data saved:", data);
+        setBudgetTotal(parseFloat(data.monthlyBudget));
+        setGoalMessage(data.goalMessage);
+        setBudgetSpent(data.totalSpent);
+        setCategories(data.categories);
+        setTransactions(data.transactions);
         router.push("/dashboard");
       } else {
         setError(data.error || "An error occurred while signing up.");
