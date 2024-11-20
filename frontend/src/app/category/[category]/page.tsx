@@ -36,6 +36,8 @@ export default function CategoryPage() {
   const [currentSubcategories, setCurrentSubcategories] = useState<DetailedCategory | null>(null);
   const [currentInsights, setCurrentInsights] = useState<Insight | null>(null);
   const [fileChanged, setFileChanged] = useState(false);
+  const [spentPercentage, setSpentPercentage] = useState(0);
+  const [subSpentPercentages, setSubSpentPercentages] = useState<{ [key: string]: number }>({});
 
   const totalCategoryBudget = 50; // Default category budget
 
@@ -107,10 +109,29 @@ export default function CategoryPage() {
     return () => clearInterval(interval); // Cleanup on unmount
   }, [category]);
 
+  // Update animations for percentages
+  useEffect(() => {
+    if (category && categories[category] !== undefined) {
+      const amountSpent = categories[category];
+      const percentage = Math.min((amountSpent / totalCategoryBudget) * 100, 100);
+      setSpentPercentage(percentage);
+
+      if (currentSubcategories) {
+        const percentages = Object.entries(currentSubcategories.breakdown).reduce(
+          (acc, [subcategory, spent]) => {
+            acc[subcategory] = Math.min((spent / totalCategoryBudget) * 100, 100);
+            return acc;
+          },
+          {} as { [key: string]: number }
+        );
+        setSubSpentPercentages(percentages);
+      }
+    }
+  }, [categories, currentSubcategories, category]);
+
   const amountSpent =
     category && categories[category] !== undefined ? categories[category].toFixed(2) : '0';
   const remainingBudget = (totalCategoryBudget - parseFloat(amountSpent)).toFixed(2);
-  const spentPercentage = ((parseFloat(amountSpent) / totalCategoryBudget) * 100).toFixed(2);
 
   if (!category) {
     return (
@@ -131,10 +152,10 @@ export default function CategoryPage() {
             <h2 className="text-xl font-bold mb-4">Budget Overview</h2>
             <div className="flex items-center">
               <span className="w-20 text-sm font-medium text-green-500">Spent</span>
-              <div className="flex-grow h-4 bg-gray-800 rounded-full relative">
+              <div className="flex-grow h-4 bg-gray-800 rounded-full relative overflow-hidden">
                 <div
-                  className="h-full bg-green-500 rounded-full"
-                  style={{ width: `${Math.min(parseFloat(spentPercentage), 100)}%` }}
+                  className="h-full bg-green-500 rounded-full transition-all duration-1000"
+                  style={{ width: `${spentPercentage}%` }}
                 ></div>
               </div>
               <span className="w-16 text-sm font-medium text-green-500 text-right">
@@ -154,25 +175,22 @@ export default function CategoryPage() {
             <div className="bg-zinc-900 rounded-lg p-5 mt-6">
               {/* Breakdown */}
               <h2 className="text-xl font-bold mb-4">Breakdown</h2>
-              {Object.entries(currentSubcategories.breakdown).map(([subcategory, spent], index) => {
-                const subSpentPercentage = ((spent / totalCategoryBudget) * 100).toFixed(2);
-                return (
-                  <div key={index} className="mb-4">
-                    <p className="text-white text-sm">
-                      {subcategory} - ${spent.toFixed(2)}
-                    </p>
-                    <div className="w-full bg-zinc-800 rounded-full h-4">
-                      <div
-                        className="h-full rounded-full transition-all duration-1000"
-                        style={{
-                          width: `${Math.min(parseFloat(subSpentPercentage), 100)}%`,
-                          backgroundColor: '#1E90FF',
-                        }}
-                      ></div>
-                    </div>
+              {Object.entries(currentSubcategories.breakdown).map(([subcategory, spent], index) => (
+                <div key={index} className="mb-4">
+                  <p className="text-white text-sm">
+                    {subcategory} - ${spent.toFixed(2)}
+                  </p>
+                  <div className="w-full bg-zinc-800 rounded-full h-4 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-1000"
+                      style={{
+                        width: `${subSpentPercentages[subcategory] || 0}%`,
+                        backgroundColor: '#1E90FF',
+                      }}
+                    ></div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -182,15 +200,15 @@ export default function CategoryPage() {
           <div className="w-full lg:w-1/2 lg:ml-6 mt-6 lg:mt-0 bg-zinc-900 rounded-lg p-5">
             <h2 className="text-xl font-bold mb-4">Insights</h2>
             <div className="mb-4">
-              <p className="text-white text-sm font-semibold">This Month&apos;`s Insight:</p>
+              <p className="text-white text-sm font-semibold">This Month&apos;s Insight:</p>
               <p className="text-zinc-400 text-sm">{currentInsights.current_month_insight}</p>
             </div>
             <div className="mb-4">
-              <p className="text-white text-sm font-semibold">Last Month&apos;`s Insight:</p>
+              <p className="text-white text-sm font-semibold">Last Month&apos;s Insight:</p>
               <p className="text-zinc-400 text-sm">{currentInsights.last_month_insight}</p>
             </div>
             <div className="mb-4">
-              <p className="text-white text-sm font-semibold">Last Year&apos;`s Insight:</p>
+              <p className="text-white text-sm font-semibold">Last Year&apos;s Insight:</p>
               <p className="text-zinc-400 text-sm">{currentInsights.last_year_insight}</p>
             </div>
             <div className="mb-4">

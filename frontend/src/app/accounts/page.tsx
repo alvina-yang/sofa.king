@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; 
 import { useGlobalState } from '../context/GlobalState';
 import { FloatingDock } from "@/components/ui/floating-dock";
@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/card";
 
 export default function Accounts() {
-  
   const {
     budgetTotal,
     setBudgetTotal,
@@ -27,6 +26,9 @@ export default function Accounts() {
     transactions,
     setTransactions,
   } = useGlobalState();
+
+  const [spentAnimationWidth, setSpentAnimationWidth] = useState(0);
+  const [earnedAnimationWidth, setEarnedAnimationWidth] = useState(0);
 
   // Fetch updated user data
   const fetchUserData = async () => {
@@ -68,21 +70,31 @@ export default function Accounts() {
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
-  // Calculate percentage spent, capping at 100%
+  // Calculate percentages
   const spentPercentage = budgetTotal
-    ? Math.min((budgetSpent / budgetTotal) * 100, 100).toFixed(2)
-    : '0';
+    ? Math.min((budgetSpent / budgetTotal) * 100, 100)
+    : 0;
 
-  // Set earnings and remaining balance
   const earnings = 10000; // Example total earnings
+  const earnedPercentage = (earnings / 10000) * 100;
+
   const remainingBalance = (earnings - budgetSpent).toFixed(2); // Remaining balance in the bank account
+
+  // Animate progress bars
+  useEffect(() => {
+    const animationTimeout = setTimeout(() => {
+      setSpentAnimationWidth(spentPercentage);
+      setEarnedAnimationWidth(earnedPercentage);
+    }, 200);
+
+    return () => clearTimeout(animationTimeout);
+  }, [spentPercentage, earnedPercentage]);
 
   // Prepare transaction data for the chart
   const chartData = transactions.map((transaction) => ({
     date: transaction.Date,
     amount: transaction.Amount,
   }));
-
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-between p-6">
@@ -100,14 +112,14 @@ export default function Accounts() {
               <div className="flex flex-col gap-2 mb-3">
                 <div className="flex items-center">
                   <span className="w-20 text-sm font-medium text-red-500">Spent</span>
-                  <div className="flex-grow h-4 bg-gray-800 rounded-full relative">
+                  <div className="flex-grow h-4 bg-gray-800 rounded-full relative overflow-hidden">
                     <div
-                      className="h-full bg-red-500 rounded-full"
-                      style={{ width: `${spentPercentage}%` }}
+                      className="h-full bg-red-500 rounded-full transition-all duration-1000"
+                      style={{ width: `${spentAnimationWidth}%` }}
                     ></div>
                   </div>
                   <span className="w-16 text-sm font-medium text-red-500 text-right">
-                    {spentPercentage}%
+                    {spentPercentage.toFixed(2)}%
                   </span>
                 </div>
                 <p className="text-sm text-zinc-400 text-center mt-2">
@@ -119,14 +131,14 @@ export default function Accounts() {
               <div className="flex flex-col gap-2">
                 <div className="flex items-center">
                   <span className="w-20 text-sm font-medium text-green-500">Earned</span>
-                  <div className="flex-grow h-4 bg-gray-800 rounded-full relative">
+                  <div className="flex-grow h-4 bg-gray-800 rounded-full relative overflow-hidden">
                     <div
-                      className="h-full bg-green-500 rounded-full"
-                      style={{ width: `${(earnings / 10000) * 100}%` }}
+                      className="h-full bg-green-500 rounded-full transition-all duration-1000"
+                      style={{ width: `${earnedAnimationWidth}%` }}
                     ></div>
                   </div>
                   <span className="w-16 text-sm font-medium text-green-500 text-right">
-                    {(earnings / 10000) * 100}%
+                    {earnedPercentage.toFixed(2)}%
                   </span>
                 </div>
                 <p className="text-sm text-zinc-400 text-center mt-2">
@@ -182,7 +194,6 @@ export default function Accounts() {
                   animationEasing="ease-out" 
                   animationBegin={0} 
                 />
-
               </LineChart>
             </CardContent>
           </Card>
@@ -190,22 +201,21 @@ export default function Accounts() {
 
         {/* Right Column - Categories */}
         <div className="w-full lg:w-1/3 bg-zinc-900 rounded-lg p-5 flex flex-col gap-4">
-        <h2 className="text-xl font-bold">Categories</h2>
-        <div className="flex flex-col gap-2 overflow-y-auto h-full">
-          {Object.keys(categories).map((category, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between py-2 border-b border-gray-700 cursor-pointer"
-              onClick={() => router.push(`/category/${category}`)} // Navigate to the dynamic category page
-            >
-              <span className="text-md font-medium">{category}</span>
-              <span className="text-gray-400">→</span>
-            </div>
-          ))}
+          <h2 className="text-xl font-bold">Categories</h2>
+          <div className="flex flex-col gap-2 overflow-y-auto h-full">
+            {Object.keys(categories).map((category, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between py-2 border-b border-gray-700 cursor-pointer"
+                onClick={() => router.push(`/category/${category}`)} // Navigate to the dynamic category page
+              >
+                <span className="text-md font-medium">{category}</span>
+                <span className="text-gray-400">→</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-
 
       {/* Floating Dock */}
       <div className="mt-6 mb-2">
