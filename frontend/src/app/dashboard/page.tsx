@@ -65,11 +65,15 @@ export default function Dashboard() {
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
+  // Calculate total for all categories
+  const totalCategorySpending = Object.values(categories).reduce(
+    (acc, value) => acc + value,
+    0
+  );
+
   // Prepare data for the donut chart
   const categoryLabels = Object.keys(categories || {});
-  const categoryValues = categoryLabels.map(
-    (label) => categories[label] * budgetSpent
-  );
+  const categoryValues = categoryLabels.map((label) => categories[label]);
 
   const data = {
     labels: categoryLabels,
@@ -112,22 +116,29 @@ export default function Dashboard() {
         {/* Category Breakdown Section */}
         <div className="w-full lg:w-1/2 bg-zinc-900 p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-bold text-white mb-4">Category Breakdown</h2>
-          {categoryLabels.map((category, index) => (
-            <div key={index} className="mb-4">
-              <p className="text-white text-sm">
-                {category} - {(categories[category] * 100).toFixed(0)}% of total spending
-              </p>
-              <div className="w-full bg-zinc-800 rounded-full h-4">
-                <div
-                  className="h-full rounded-full transition-all duration-1000"
-                  style={{
-                    width: `${(categories[category] * 100).toFixed(2)}%`,
-                    backgroundColor: colors[index % colors.length],
-                  }}
-                ></div>
+          {categoryLabels.map((category, index) => {
+            // Calculate percentage for each category
+            const percentage = totalCategorySpending
+              ? Math.min((categories[category] / totalCategorySpending) * 100, 100).toFixed(2)
+              : '0';
+
+            return (
+              <div key={index} className="mb-4">
+                <p className="text-white text-sm">
+                  {category} - {percentage}% of total spending
+                </p>
+                <div className="w-full bg-zinc-800 rounded-full h-4">
+                  <div
+                    className="h-full rounded-full transition-all duration-1000"
+                    style={{
+                      width: `${percentage}%`,
+                      backgroundColor: colors[index % colors.length],
+                    }}
+                  ></div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

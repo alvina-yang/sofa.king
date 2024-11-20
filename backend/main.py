@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from ollama_detailed_processor import process_detailed_transactions
 from csv_loader import load_csv_data
 from ollama_processor import process_transactions
 from goal_message import generate_goal_message
@@ -14,6 +15,7 @@ CORS(app)
 
 user_data = {}  # Global variable to store user data
 file_changed = False  # Flag to indicate file change
+subcategories = {}  # Global variable to store subcategories
 
 class TransactionFileHandler(FileSystemEventHandler):
     def on_modified(self, event):
@@ -36,10 +38,20 @@ def update_user_data():
 
         # Update user_data
         user_data['totalSpent'] = total_amount
-        user_data['categories'] = {
-            category: (amount / total_amount if total_amount > 0 else 0)
-            for category, amount in categories.items()
-        }
+        user_data['categories'] = categories
+
+       # Process detailed transactions for subcategories
+        detailed_results = process_detailed_transactions(transactions)
+        global subcategories
+        subcategories = detailed_results.get("categories", {})
+
+        # Ensure category totals are consistent with subcategories
+        for category, data in subcategories.items():
+            # Recompute category total as the sum of its subcategories
+            sub_total = sum(data['breakdown'].values())
+            data['total'] = round(sub_total, 2)
+            # Update the main category total to match sub_total
+            categories[category] = round(sub_total, 2)
 
         # Generate goal message
         monthly_budget = user_data.get('monthlyBudget', 0)
@@ -73,6 +85,13 @@ def file_changed_status():
         file_changed = False  # Reset flag
         return jsonify({"fileChanged": True}), 200
     return jsonify({"fileChanged": False}), 200
+
+@app.route('/api/get-subcategories/<category>', methods=['GET'])
+def get_subcategories(category):
+    if category in subcategories:
+        return jsonify(subcategories[category]), 200
+    else:
+        return jsonify({"error": f"No subcategories found for category {category}"}), 404
 
 @app.route('/api/user-data', methods=['POST'])
 def user_data_route():

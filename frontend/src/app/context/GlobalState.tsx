@@ -8,6 +8,15 @@ interface Transaction {
   Amount: number;
 }
 
+interface SubcategoryBreakdown {
+  [subcategory: string]: number;
+}
+
+interface DetailedCategory {
+  total: number;
+  breakdown: SubcategoryBreakdown;
+}
+
 interface GlobalState {
   budgetTotal: number;
   setBudgetTotal: (value: number) => void;
@@ -19,6 +28,8 @@ interface GlobalState {
   setGoalMessage: (value: string) => void;
   transactions: Transaction[];
   setTransactions: (value: Transaction[]) => void;
+  subcategories: { [key: string]: DetailedCategory };
+  setSubcategories: (value: { [key: string]: DetailedCategory }) => void;
 }
 
 // Create default values for the context
@@ -33,6 +44,8 @@ const defaultState: GlobalState = {
   setGoalMessage: () => {},
   transactions: [],
   setTransactions: () => {},
+  subcategories: {},
+  setSubcategories: () => {},
 };
 
 const GlobalStateContext = createContext<GlobalState>(defaultState);
@@ -43,6 +56,7 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [categories, setCategories] = useState<{ [key: string]: number }>({});
   const [goalMessage, setGoalMessage] = useState('');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [subcategories, setSubcategories] = useState<{ [key: string]: DetailedCategory }>({});
 
   return (
     <GlobalStateContext.Provider
@@ -57,6 +71,8 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
         setGoalMessage,
         transactions,
         setTransactions,
+        subcategories,
+        setSubcategories,
       }}
     >
       {children}

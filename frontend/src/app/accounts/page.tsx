@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation'; 
 import { useGlobalState } from '../context/GlobalState';
 import { FloatingDock } from "@/components/ui/floating-dock";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip } from "recharts";
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/card";
 
 export default function Accounts() {
+  
   const {
     budgetTotal,
     setBudgetTotal,
@@ -20,6 +22,7 @@ export default function Accounts() {
     setBudgetSpent,
     categories,
     setCategories,
+    goalMessage,
     setGoalMessage,
     transactions,
     setTransactions,
@@ -33,15 +36,17 @@ export default function Accounts() {
       const data = await response.json();
 
       // Update global state
-      setBudgetTotal(data.monthlyBudget || 0);
-      setBudgetSpent(data.totalSpent || 0);
-      setCategories(data.categories || {});
-      setGoalMessage(data.goalMessage || '');
-      setTransactions(data.transactions || []);
+      setBudgetTotal(data.monthlyBudget ?? budgetTotal);
+      setBudgetSpent(data.totalSpent ?? budgetSpent);
+      setCategories(data.categories ?? categories);
+      setGoalMessage(data.goalMessage ?? goalMessage);
+      setTransactions(data.transactions ?? transactions);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
   };
+
+  const router = useRouter();
 
   // Poll for file changes
   const checkFileChanges = async () => {
@@ -77,6 +82,7 @@ export default function Accounts() {
     date: transaction.Date,
     amount: transaction.Amount,
   }));
+
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-between p-6">
@@ -172,28 +178,34 @@ export default function Accounts() {
                   stroke="#1E90FF"
                   strokeWidth={2}
                   dot={false}
+                  animationDuration={1500} 
+                  animationEasing="ease-out" 
+                  animationBegin={0} 
                 />
+
               </LineChart>
             </CardContent>
           </Card>
         </div>
 
-       {/* Right Column - Categories */}
-       <div className="w-full lg:w-1/3 bg-zinc-900 rounded-lg p-5 flex flex-col gap-4">
-          <h2 className="text-xl font-bold">Categories</h2>
-          <div className="flex flex-col gap-2 overflow-y-auto h-full">
-            {Object.keys(categories).map((category, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between py-2 border-b border-gray-700"
-              >
-                <span className="text-md font-medium">{category}</span>
-                <span className="text-gray-400">→</span>
-              </div>
-            ))}
-          </div>
+        {/* Right Column - Categories */}
+        <div className="w-full lg:w-1/3 bg-zinc-900 rounded-lg p-5 flex flex-col gap-4">
+        <h2 className="text-xl font-bold">Categories</h2>
+        <div className="flex flex-col gap-2 overflow-y-auto h-full">
+          {Object.keys(categories).map((category, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between py-2 border-b border-gray-700 cursor-pointer"
+              onClick={() => router.push(`/category/${category}`)} // Navigate to the dynamic category page
+            >
+              <span className="text-md font-medium">{category}</span>
+              <span className="text-gray-400">→</span>
+            </div>
+          ))}
         </div>
       </div>
+    </div>
+
 
       {/* Floating Dock */}
       <div className="mt-6 mb-2">
