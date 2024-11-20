@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from ollama_detailed_processor import process_detailed_transactions
 from csv_loader import load_csv_data
+from insights_processor import generate_insights
 from ollama_processor import process_transactions
 from goal_message import generate_goal_message
 from watchdog.observers import Observer
@@ -9,6 +10,7 @@ from watchdog.events import FileSystemEventHandler
 import threading
 import time
 import os
+import random
 
 app = Flask(__name__)
 CORS(app)
@@ -16,6 +18,7 @@ CORS(app)
 user_data = {}  # Global variable to store user data
 file_changed = False  # Flag to indicate file change
 subcategories = {}  # Global variable to store subcategories
+insights_data = {}  # Global variable to store insights
 
 class TransactionFileHandler(FileSystemEventHandler):
     def on_modified(self, event):
@@ -24,6 +27,7 @@ class TransactionFileHandler(FileSystemEventHandler):
             print(f"File {event.src_path} has been modified")
             file_changed = True
             update_user_data()  # Update user_data when file changes
+
 
 def update_user_data():
     try:
@@ -59,8 +63,41 @@ def update_user_data():
         message = generate_goal_message(monthly_budget, total_amount, short_term_goal)
         user_data['goalMessage'] = message
 
+        # Generate insights for all categories
+        generate_all_insights()
+        
     except Exception as e:
         print(f"Error updating user data: {e}")
+
+
+def generate_all_insights():
+    try:
+        insights = {}
+        categories = user_data.get('categories', {})
+        transactions = user_data.get('transactions', [])
+
+        for category in categories:
+            # Use actual total for the current month's category
+            current_month_total = categories.get(category, 0)
+            # Simulate last month's and last year's totals
+            last_month_total = round(current_month_total * random.uniform(0.8, 1.2), 2)
+            last_year_total = round(current_month_total * random.uniform(0.6, 1.4), 2)
+
+            # Generate insights using actual data
+            insight = generate_insights(
+                category,
+                current_month_total,
+                last_month_total,
+                last_year_total,
+                transactions
+            )
+            insights[category] = insight
+
+        # Store insights in user_data
+        user_data['insights'] = insights
+
+    except Exception as e:
+        print(f"Error generating insights: {e}")
 
 def start_file_watcher():
     path = os.path.dirname(os.path.abspath(__file__)) + "/data"
@@ -162,6 +199,21 @@ def add_transaction():
     except ValueError as ve:
         return jsonify({"error": f"Invalid data: {ve}"}), 400
     except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+@app.route('/api/get-insights/<category>', methods=['GET'])
+def get_insights(category):
+    try:
+        # Retrieve precomputed insights from user_data
+        insights = user_data.get('insights', {})
+
+        if category in insights:
+            return jsonify(insights[category]), 200
+        else:
+            return jsonify({"error": f"No insights found for category '{category}'."}), 404
+
+    except Exception as e:
+        print(f"Error retrieving insights for category '{category}': {e}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 if __name__ == "__main__":
