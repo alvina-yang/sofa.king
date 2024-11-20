@@ -21,6 +21,34 @@ class TransactionFileHandler(FileSystemEventHandler):
         if event.src_path.endswith("transactions.csv"):
             print(f"File {event.src_path} has been modified")
             file_changed = True
+            update_user_data()  # Update user_data when file changes
+
+def update_user_data():
+    try:
+        # Load transactions
+        transactions = load_csv_data('data/transactions.csv')
+        user_data['transactions'] = transactions
+
+        # Process transactions
+        results = process_transactions(transactions)
+        total_amount = results['total']
+        categories = results['categories']
+
+        # Update user_data
+        user_data['totalSpent'] = total_amount
+        user_data['categories'] = {
+            category: (amount / total_amount if total_amount > 0 else 0)
+            for category, amount in categories.items()
+        }
+
+        # Generate goal message
+        monthly_budget = user_data.get('monthlyBudget', 0)
+        short_term_goal = user_data.get('shortTermGoal', '')
+        message = generate_goal_message(monthly_budget, total_amount, short_term_goal)
+        user_data['goalMessage'] = message
+
+    except Exception as e:
+        print(f"Error updating user data: {e}")
 
 def start_file_watcher():
     path = os.path.dirname(os.path.abspath(__file__)) + "/data"
@@ -46,58 +74,21 @@ def file_changed_status():
         return jsonify({"fileChanged": True}), 200
     return jsonify({"fileChanged": False}), 200
 
-@app.route('/api/transaction-analysis', methods=['GET'])
-def transaction_analysis():
-    try:
-        # Load and process transactions
-        transactions = load_csv_data('data/transactions.csv')
-        results = process_transactions(transactions)
-        
-        # Calculate percentages for each category
-        total_amount = results["total"]
-        categories = results["categories"]
-        
-        # Calculate percentage for each category
-        category_percentages = {category: (amount / total_amount) for category, amount in categories.items()}
-
-        # Prepare final data structure
-        response_data = {
-            "total": total_amount,
-            "categories": category_percentages,
-        }
-
-        return jsonify(response_data), 200
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 500
-
-
 @app.route('/api/user-data', methods=['POST'])
 def user_data_route():
     try:
         data = request.get_json()
-        monthly_budget = float(data.get("monthlyBudget"))
-        short_term_goal = data.get("shortTermGoal")
-        long_term_goal = data.get("longTermGoal")
+        monthly_budget = float(data.get("monthlyBudget", 0))
+        short_term_goal = data.get("shortTermGoal", "")
+        long_term_goal = data.get("longTermGoal", "")
 
-        # Store the data
+        # Update user_data
         user_data['monthlyBudget'] = monthly_budget
         user_data['shortTermGoal'] = short_term_goal
         user_data['longTermGoal'] = long_term_goal
 
-        # Load transactions
-        transactions = load_csv_data('data/transactions.csv')
-        user_data['transactions'] = transactions
-
-        # Process transactions
-        results = process_transactions(transactions)
-        total_amount = results['total']
-        categories = results['categories']
-
-        # Generate goal message
-        message = generate_goal_message(monthly_budget, total_amount, short_term_goal)
-        user_data['goalMessage'] = message
-        user_data['totalSpent'] = total_amount
-        user_data['categories'] = {category: (amount / total_amount) for category, amount in categories.items()}
+        # Update user_data with current transactions
+        update_user_data()
 
         # Prepare response
         response_data = {
@@ -114,7 +105,7 @@ def get_user_data():
         return jsonify(user_data), 200
     else:
         return jsonify({"error": "No user data available"}), 404
-    
+
 @app.route('/api/add-transaction', methods=['POST'])
 def add_transaction():
     try:
@@ -134,53 +125,25 @@ def add_transaction():
 
         # Add the new transaction to the list
         transaction = {
-            "amount": amount,
-            "date": date,
-            "merchant": merchant
+            "Amount": amount,
+            "Date": date,
+            "Merchant": merchant
         }
         user_data["transactions"].append(transaction)
 
-        # Process all transactions using process_transactions
-        processed_results = process_transactions(user_data["transactions"])
-
-        # Extract processed totals and categories
-        total_amount = processed_results["total"]
-        categories = processed_results["categories"]
-
         # Update user_data
-        user_data["totalSpent"] = total_amount
-        user_data["categories"] = {
-            category: (amount / total_amount if total_amount > 0 else 0)
-            for category, amount in categories.items()
-        }
+        update_user_data()
 
         # Prepare and return the response
         return jsonify({
             "message": "Transaction added successfully",
-            "totalSpent": user_data["totalSpent"],
-            "categories": user_data["categories"],
-            "transactions": user_data["transactions"]
+            **user_data
         }), 200
 
     except ValueError as ve:
         return jsonify({"error": f"Invalid data: {ve}"}), 400
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
-
-
-@app.route('/api/view-user-data', methods=['GET'])
-def view_user_data():
-    """
-    Endpoint to view the entire user_data object.
-    """
-    try:
-        if user_data:
-            return jsonify(user_data), 200
-        else:
-            return jsonify({"error": "No user data available"}), 404
-    except Exception as e:
-        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
-
 
 if __name__ == "__main__":
     app.run(debug=True)

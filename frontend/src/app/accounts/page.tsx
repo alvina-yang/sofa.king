@@ -31,10 +31,12 @@ export default function Accounts() {
       const response = await fetch('http://localhost:5000/api/get-user-data');
       if (!response.ok) throw new Error('Failed to fetch user data');
       const data = await response.json();
-      setBudgetTotal(data.monthlyBudget);
-      setBudgetSpent(data.totalSpent);
-      setCategories(data.categories);
-      setGoalMessage(data.goalMessage);
+
+      // Update global state
+      setBudgetTotal(data.monthlyBudget || 0);
+      setBudgetSpent(data.totalSpent || 0);
+      setCategories(data.categories || {});
+      setGoalMessage(data.goalMessage || '');
       setTransactions(data.transactions || []);
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -48,7 +50,7 @@ export default function Accounts() {
       if (!response.ok) throw new Error('Failed to check file change');
       const data = await response.json();
       if (data.fileChanged) {
-        await fetchUserData(); // Refresh data if file has changed
+        await fetchUserData(); // Refresh data on file change
       }
     } catch (error) {
       console.error('Error checking file changes:', error);
@@ -62,11 +64,13 @@ export default function Accounts() {
   }, []);
 
   // Calculate percentage spent, capping at 100%
-  const spentPercentage = Math.min((budgetSpent / budgetTotal) * 100, 100).toFixed(2);
+  const spentPercentage = budgetTotal
+    ? Math.min((budgetSpent / budgetTotal) * 100, 100).toFixed(2)
+    : '0';
 
   // Set earnings and remaining balance
   const earnings = 10000; // Example total earnings
-  const remainingBalance = earnings - budgetSpent; // Remaining balance in the bank account
+  const remainingBalance = (earnings - budgetSpent).toFixed(2); // Remaining balance in the bank account
 
   // Prepare transaction data for the chart
   const chartData = transactions.map((transaction) => ({
@@ -127,7 +131,7 @@ export default function Accounts() {
 
             {/* Remaining Balance */}
             <div className="text-2xl font-bold text-center">
-              ${remainingBalance.toLocaleString()} remaining balance in bank account
+              ${remainingBalance} remaining balance in bank account
             </div>
           </div>
 
@@ -174,8 +178,8 @@ export default function Accounts() {
           </Card>
         </div>
 
-        {/* Right Column - Categories */}
-        <div className="w-full lg:w-1/3 bg-zinc-900 rounded-lg p-5 flex flex-col gap-4">
+       {/* Right Column - Categories */}
+       <div className="w-full lg:w-1/3 bg-zinc-900 rounded-lg p-5 flex flex-col gap-4">
           <h2 className="text-xl font-bold">Categories</h2>
           <div className="flex flex-col gap-2 overflow-y-auto h-full">
             {Object.keys(categories).map((category, index) => (
