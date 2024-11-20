@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useGlobalState } from '../context/GlobalState';
 import { FloatingDock } from "@/components/ui/floating-dock";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip } from "recharts";
@@ -12,17 +13,63 @@ import {
 } from "@/components/ui/card";
 
 export default function Accounts() {
-  const { budgetTotal, budgetSpent, categories, transactions } = useGlobalState();
+  const {
+    budgetTotal,
+    setBudgetTotal,
+    budgetSpent,
+    setBudgetSpent,
+    categories,
+    setCategories,
+    setGoalMessage,
+    transactions,
+    setTransactions,
+  } = useGlobalState();
 
-  // Calculate percentage spent, capping at 100% if exceeded
+  // Fetch updated user data
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/get-user-data');
+      if (!response.ok) throw new Error('Failed to fetch user data');
+      const data = await response.json();
+      setBudgetTotal(data.monthlyBudget);
+      setBudgetSpent(data.totalSpent);
+      setCategories(data.categories);
+      setGoalMessage(data.goalMessage);
+      setTransactions(data.transactions || []);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  // Poll for file changes
+  const checkFileChanges = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/file-changed');
+      if (!response.ok) throw new Error('Failed to check file change');
+      const data = await response.json();
+      if (data.fileChanged) {
+        await fetchUserData(); // Refresh data if file has changed
+      }
+    } catch (error) {
+      console.error('Error checking file changes:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData(); // Initial fetch
+    const interval = setInterval(checkFileChanges, 5000); // Poll every 5 seconds
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
+
+  // Calculate percentage spent, capping at 100%
   const spentPercentage = Math.min((budgetSpent / budgetTotal) * 100, 100).toFixed(2);
 
   // Set earnings and remaining balance
-  const earnings = 10000; // Total earnings
+  const earnings = 10000; // Example total earnings
   const remainingBalance = earnings - budgetSpent; // Remaining balance in the bank account
 
   // Prepare transaction data for the chart
-  const chartData = transactions.map(transaction => ({
+  const chartData = transactions.map((transaction) => ({
     date: transaction.Date,
     amount: transaction.Amount,
   }));
@@ -110,11 +157,11 @@ export default function Accounts() {
                   tick={{ fill: "#fff" }}
                 />
                 <Tooltip
-                    contentStyle={{ backgroundColor: "#27272a" }} // zinc-300
-                    labelStyle={{ color: "#a1a1aa" }}
-                    itemStyle={{ color: "#a1a1aa" }}
-                    labelFormatter={(label) => `Date: ${label}`}
-                  />
+                  contentStyle={{ backgroundColor: "#27272a" }} // zinc-300
+                  labelStyle={{ color: "#a1a1aa" }}
+                  itemStyle={{ color: "#a1a1aa" }}
+                  labelFormatter={(label) => `Date: ${label}`}
+                />
                 <Line
                   type="monotone"
                   dataKey="amount"
