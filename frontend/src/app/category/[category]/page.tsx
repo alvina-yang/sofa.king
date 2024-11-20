@@ -30,7 +30,6 @@ export default function CategoryPage() {
     categories,
     subcategories,
     setSubcategories,
-    setCategories,
     insights,
     setInsights,
   } = useGlobalState();

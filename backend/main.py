@@ -11,6 +11,9 @@ import threading
 import time
 import os
 import random
+import csv  
+from datetime import datetime 
+
 
 app = Flask(__name__)
 CORS(app)
@@ -65,7 +68,7 @@ def update_user_data():
 
         # Generate insights for all categories
         generate_all_insights()
-        
+
     except Exception as e:
         print(f"Error updating user data: {e}")
 
@@ -160,41 +163,52 @@ def get_user_data():
     if user_data:
         return jsonify(user_data), 200
     else:
+ 
         return jsonify({"error": "No user data available"}), 404
-
+    
 @app.route('/api/add-transaction', methods=['POST'])
 def add_transaction():
     try:
-        # Parse incoming JSON data
         data = request.get_json()
         amount = float(data.get("amount"))
-        date = data.get("date")  # Expected format: "YYYY-MM-DD"
+        date_str = data.get("date")
         merchant = data.get("merchant")
 
-        # Validate required fields
-        if not amount or not date or not merchant:
+        if not amount or not date_str or not merchant:
             return jsonify({"error": "Missing required fields: 'amount', 'date', or 'merchant'"}), 400
 
-        # Ensure transactions exist in user_data
-        if "transactions" not in user_data:
-            user_data["transactions"] = []
+        try:
+            date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+            date = date_obj.strftime("%Y-%m-%d")
+        except ValueError:
+            return jsonify({"error": "Invalid date format. Expected YYYY-MM-DD."}), 400
 
-        # Add the new transaction to the list
-        transaction = {
-            "Amount": amount,
-            "Date": date,
-            "Merchant": merchant
-        }
-        user_data["transactions"].append(transaction)
+        csv_file = 'data/transactions.csv'
+        fieldnames = ['Date', 'Merchant', 'Amount']
 
-        # Update user_data
+        # Check if the file exists and is not empty
+        file_exists = os.path.exists(csv_file) and os.path.getsize(csv_file) > 0
+
+        with open(csv_file, mode='a', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            
+            # Write header only if the file is new or empty
+            if not file_exists:
+                writer.writeheader()
+            
+            # Ensure we're on a new line before writing
+            csvfile.seek(0, os.SEEK_END)
+            # if csvfile.tell() > 0:
+            #     csvfile.write('\n')
+            
+            writer.writerow({'Date': date, 'Merchant': merchant, 'Amount': amount})
+
         update_user_data()
 
-        # Prepare and return the response
-        return jsonify({
-            "message": "Transaction added successfully",
-            **user_data
-        }), 200
+        global file_changed
+        file_changed = True
+
+        return jsonify({"message": "Transaction added successfully"}), 200
 
     except ValueError as ve:
         return jsonify({"error": f"Invalid data: {ve}"}), 400

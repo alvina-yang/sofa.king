@@ -40,6 +40,7 @@ interface GlobalState {
   setSubcategories: (value: { [key: string]: DetailedCategory }) => void;
   insights: { [key: string]: Insight };
   setInsights: (value: { [key: string]: Insight }) => void;
+  fetchUserData: () => Promise<void>;
 }
 
 // Create default values for the context
@@ -58,6 +59,7 @@ const defaultState: GlobalState = {
   setSubcategories: () => {},
   insights: {},
   setInsights: () => {},
+  fetchUserData: async () => {},
 };
 
 const GlobalStateContext = createContext<GlobalState>(defaultState);
@@ -70,6 +72,25 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [subcategories, setSubcategories] = useState<{ [key: string]: DetailedCategory }>({});
   const [insights, setInsights] = useState<{ [key: string]: Insight }>({});
+
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/get-user-data');
+      if (!response.ok) throw new Error('Failed to fetch user data');
+      const data = await response.json();
+
+      // Update global state
+      setBudgetTotal(data.monthlyBudget || 0);
+      setBudgetSpent(data.totalSpent || 0);
+      setCategories(data.categories || {});
+      setGoalMessage(data.goalMessage || '');
+      setTransactions(data.transactions || []);
+      setSubcategories(data.subcategories || {});
+      setInsights(data.insights || {});
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
 
   return (
     <GlobalStateContext.Provider
@@ -88,6 +109,7 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
         setSubcategories,
         insights,
         setInsights,
+        fetchUserData,
       }}
     >
       {children}

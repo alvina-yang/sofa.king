@@ -22,28 +22,42 @@ export default function Dashboard() {
     goalMessage,
     setGoalMessage,
     setTransactions,
+    fetchUserData,
   } = useGlobalState();
 
   const colors = ['#FFA500', '#6A5ACD', '#FF69B4', '#32CD32', '#FF4500'];
+  useEffect(() => {
+    fetchUserData(); // Initial data fetch
+    const interval = setInterval(() => {
+      fetch('http://localhost:5000/api/file-changed')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.fileChanged) {
+            fetchUserData();
+          }
+        })
+        .catch((error) => console.error('Error checking file changes:', error));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [fetchUserData]);
+  // // Fetch user data and update global state
+  // const fetchUserData = async () => {
+  //   try {
+  //     const response = await fetch('http://localhost:5000/api/get-user-data');
+  //     if (!response.ok) throw new Error('Failed to fetch user data');
 
-  // Fetch user data and update global state
-  const fetchUserData = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/get-user-data');
-      if (!response.ok) throw new Error('Failed to fetch user data');
+  //     const data = await response.json();
 
-      const data = await response.json();
-
-      // Update global state
-      setBudgetTotal(data.monthlyBudget || 0);
-      setBudgetSpent(data.totalSpent || 0);
-      setCategories(data.categories || {});
-      setGoalMessage(data.goalMessage || '');
-      setTransactions(data.transactions || []);
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-  };
+  //     // Update global state
+  //     setBudgetTotal(data.monthlyBudget || 0);
+  //     setBudgetSpent(data.totalSpent || 0);
+  //     setCategories(data.categories || {});
+  //     setGoalMessage(data.goalMessage || '');
+  //     setTransactions(data.transactions || []);
+  //   } catch (error) {
+  //     console.error('Error fetching user data:', error);
+  //   }
+  // };
 
   // Poll file-changed endpoint and update data
   const checkFileChanges = async () => {

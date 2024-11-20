@@ -57,7 +57,7 @@ def generate_insights(category, current_month_total, last_month_total, last_year
                 "transactions": json.dumps(transactions, indent=4)
             })
 
-            print(result)
+            # print(result)
             
             # Extract JSON from the result
             start_index = result.index('{')

@@ -2,10 +2,11 @@
 import { cn } from "@/lib/utils";
 import {
   IconLayoutNavbarCollapse,
-  IconHome2, 
+  IconHome2,
   IconWallet,
-  IconCash, 
-  IconHelp, 
+  IconCash,
+  IconHelp,
+  IconPlus, // Import Plus Icon
 } from "@tabler/icons-react";
 import {
   AnimatePresence,
@@ -18,26 +19,35 @@ import {
 import Link from "next/link";
 import { useRef, useState } from "react";
 
+import AddTransactionModal from "@/components/AddTransactionModal"; 
+
 const links = [
   {
     title: "Home",
-    icon: <IconHome2 className="h-full w-full text-zinc-200 dark:text-zinc-300" />, 
+    icon: <IconHome2 className="h-full w-full text-zinc-200 dark:text-zinc-300" />,
     href: "/dashboard",
   },
   {
     title: "Accounts",
-    icon: <IconWallet className="h-full w-full text-zinc-200 dark:text-zinc-300" />, 
+    icon: <IconWallet className="h-full w-full text-zinc-200 dark:text-zinc-300" />,
     href: "/accounts",
   },
   {
     title: "Budgets",
-    icon: <IconCash className="h-full w-full text-zinc-200 dark:text-zinc-300" />, 
+    icon: <IconCash className="h-full w-full text-zinc-200 dark:text-zinc-300" />,
     href: "/budgets",
   },
   {
     title: "Help",
-    icon: <IconHelp className="h-full w-full text-zinc-200 dark:text-zinc-300" />, 
+    icon: <IconHelp className="h-full w-full text-zinc-200 dark:text-zinc-300" />,
     href: "/help",
+  },
+  // Add the new "Add Transaction" link
+  {
+    title: "Add Transaction",
+    icon: <IconPlus className="h-full w-full text-zinc-200 dark:text-zinc-300" />,
+    href: "#",
+    isAction: true, // Indicate that this is an action, not a link
   },
 ];
 
@@ -60,53 +70,66 @@ const FloatingDockMobile = ({
   items,
   className,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
+  items: { title: string; icon: React.ReactNode; href: string; isAction?: boolean }[];
   className?: string;
 }) => {
   const [open, setOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false); // State for modal visibility
+
   return (
-    <div
-      className={cn(
-        "fixed bottom-4 right-4 z-50 block md:hidden", 
-        className
-      )}
-    >
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            layoutId="nav"
-            className="absolute bottom-full mb-2 right-0 flex flex-col gap-2"
-          >
-            {items.map((item, idx) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{
-                  opacity: 0,
-                  y: 10,
-                  transition: { delay: idx * 0.05 },
-                }}
-                transition={{ delay: (items.length - 1 - idx) * 0.05 }}
-              >
-                <Link
-                  href={item.href}
-                  className="h-10 w-10 rounded-full bg-zinc-700 flex items-center justify-center"
+    <>
+      <div className={cn("fixed bottom-4 right-4 z-50 block md:hidden", className)}>
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              layoutId="nav"
+              className="absolute bottom-full mb-2 right-0 flex flex-col gap-2"
+            >
+              {items.map((item, idx) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{
+                    opacity: 0,
+                    y: 10,
+                    transition: { delay: idx * 0.05 },
+                  }}
+                  transition={{ delay: (items.length - 1 - idx) * 0.05 }}
                 >
-                  <div className="h-4 w-4">{item.icon}</div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <button
-        onClick={() => setOpen(!open)}
-        className="h-12 w-12 rounded-full bg-zinc-800 flex items-center justify-center"
-      >
-        <IconLayoutNavbarCollapse className="h-6 w-6 text-zinc-200" />
-      </button>
-    </div>
+                  {item.isAction ? (
+                    // For the "Add Transaction" button
+                    <button
+                      onClick={() => setShowModal(true)}
+                      className="h-10 w-10 rounded-full bg-zinc-700 flex items-center justify-center"
+                    >
+                      <div className="h-4 w-4">{item.icon}</div>
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className="h-10 w-10 rounded-full bg-zinc-700 flex items-center justify-center"
+                    >
+                      <div className="h-4 w-4">{item.icon}</div>
+                    </Link>
+                  )}
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <button
+          onClick={() => setOpen(!open)}
+          className="h-12 w-12 rounded-full bg-zinc-800 flex items-center justify-center"
+        >
+          <IconLayoutNavbarCollapse className="h-6 w-6 text-zinc-200" />
+        </button>
+      </div>
+      {/* Add Transaction Modal */}
+      {showModal && <AddTransactionModal onClose={() => setShowModal(false)} onTransactionAdded={function (): void {
+        throw new Error("Function not implemented.");
+      } } />}
+    </>
   );
 };
 
@@ -114,23 +137,40 @@ const FloatingDockDesktop = ({
   items,
   className,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
+  items: { title: string; icon: React.ReactNode; href: string; isAction?: boolean }[];
   className?: string;
 }) => {
   let mouseX = useMotionValue(Infinity);
+  const [showModal, setShowModal] = useState(false); // State for modal visibility
+
   return (
-    <motion.div
-      onMouseMove={(e) => mouseX.set(e.clientX)}
-      onMouseLeave={() => mouseX.set(Infinity)}
-      className={cn(
-        "fixed bottom-4 left-1/2 -translate-x-1/2 z-50 hidden md:flex h-16 gap-x-8 items-end rounded-2xl bg-zinc-800 px-4 pb-3",
-        className
-      )}
-    >
-      {items.map((item) => (
-        <IconContainer mouseX={mouseX} key={item.title} {...item} />
-      ))}
-    </motion.div>
+    <>
+      <motion.div
+        onMouseMove={(e) => mouseX.set(e.clientX)}
+        onMouseLeave={() => mouseX.set(Infinity)}
+        className={cn(
+          "fixed bottom-4 left-1/2 -translate-x-1/2 z-50 hidden md:flex h-16 gap-x-8 items-end rounded-2xl bg-zinc-800 px-4 pb-3",
+          className
+        )}
+      >
+        {items.map((item) => (
+          <IconContainer
+            mouseX={mouseX}
+            key={item.title}
+            {...item}
+            onClick={() => {
+              if (item.isAction) {
+                setShowModal(true);
+              }
+            }}
+          />
+        ))}
+      </motion.div>
+      {/* Add Transaction Modal */}
+      {showModal && <AddTransactionModal onClose={() => setShowModal(false)} onTransactionAdded={function (): void {
+        throw new Error("Function not implemented.");
+      } } />}
+    </>
   );
 };
 
@@ -139,11 +179,15 @@ function IconContainer({
   title,
   icon,
   href,
+  isAction = false,
+  onClick,
 }: {
   mouseX: MotionValue;
   title: string;
   icon: React.ReactNode;
   href: string;
+  isAction?: boolean;
+  onClick?: () => void;
 }) {
   let ref = useRef<HTMLDivElement>(null);
 
@@ -182,34 +226,39 @@ function IconContainer({
 
   const [hovered, setHovered] = useState(false);
 
-  return (
-    <Link href={href}>
+  const content = (
+    <motion.div
+      ref={ref}
+      style={{ width, height }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="aspect-square rounded-full bg-zinc-700 flex items-center justify-center relative"
+      onClick={onClick}
+    >
+      <AnimatePresence>
+        {hovered && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: 2, x: "-50%" }}
+            className="px-2 py-0.5 whitespace-pre rounded-md bg-zinc-800 border border-zinc-600 text-zinc-200 absolute left-1/2 -translate-x-1/2 -top-8 w-fit text-xs"
+          >
+            {title}
+          </motion.div>
+        )}
+      </AnimatePresence>
       <motion.div
-        ref={ref}
-        style={{ width, height }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        className="aspect-square rounded-full bg-zinc-700 flex items-center justify-center relative"
+        style={{ width: widthIcon, height: heightIcon }}
+        className="flex items-center justify-center"
       >
-        <AnimatePresence>
-          {hovered && (
-            <motion.div
-              initial={{ opacity: 0, y: 10, x: "-50%" }}
-              animate={{ opacity: 1, y: 0, x: "-50%" }}
-              exit={{ opacity: 0, y: 2, x: "-50%" }}
-              className="px-2 py-0.5 whitespace-pre rounded-md bg-zinc-800 border border-zinc-600 text-zinc-200 absolute left-1/2 -translate-x-1/2 -top-8 w-fit text-xs"
-            >
-              {title}
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <motion.div
-          style={{ width: widthIcon, height: heightIcon }}
-          className="flex items-center justify-center"
-        >
-          {icon}
-        </motion.div>
+        {icon}
       </motion.div>
-    </Link>
+    </motion.div>
+  );
+
+  return isAction ? (
+    <button>{content}</button>
+  ) : (
+    <Link href={href}>{content}</Link>
   );
 }
