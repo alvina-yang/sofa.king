@@ -1,17 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useGlobalState } from '../context/GlobalState';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards';
-import { FloatingDock } from '@/components/ui/floating-dock';
+import { useState } from "react";
+import { useGlobalState } from "../context/GlobalState";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
+import { FloatingDock } from "@/components/ui/floating-dock";
 
 export default function BudgetsPage() {
   const {
@@ -21,43 +15,78 @@ export default function BudgetsPage() {
     setCategoryBudgets,
   } = useGlobalState();
 
-  const [newBudget, setNewBudget] = useState<number | ''>('');
-  const [localCategoryBudgets, setLocalCategoryBudgets] = useState({ ...categoryBudgets });
-  const [errorMessage, setErrorMessage] = useState('');
-  const [overallSuccessMessage, setOverallSuccessMessage] = useState('');
-  const [categorySuccessMessage, setCategorySuccessMessage] = useState('');
+  const [newBudget, setNewBudget] = useState<number | "">("");
+  const [localCategoryBudgets, setLocalCategoryBudgets] = useState({
+    ...categoryBudgets,
+  });
+  const [errorMessage, setErrorMessage] = useState("");
+  const [overallSuccessMessage, setOverallSuccessMessage] = useState("");
+  const [categorySuccessMessage, setCategorySuccessMessage] = useState("");
   const [isUpdatingOverall, setIsUpdatingOverall] = useState(false);
   const [isUpdatingCategories, setIsUpdatingCategories] = useState(false);
 
+  const testimonials = [
+    {
+      quote: "This app is so good, it’s like discovering gravity all over again.",
+      name: "Isaac Newton",
+      designation: "Physicist & Mathematician",
+      src:  "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Portrait_of_Sir_Isaac_Newton%2C_1689_%28brightened%29.jpg/1200px-Portrait_of_Sir_Isaac_Newton%2C_1689_%28brightened%29.jpg",
+    },
+    {
+      quote: "The best budgeting tool since the Emancipation Proclamation.",
+      name: "Abraham Lincoln",
+      designation: "16th U.S. President",
+      src:  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Abraham_Lincoln_O-77_matte_collodion_print.jpg/800px-Abraham_Lincoln_O-77_matte_collodion_print.jpg",
+    },
+    {
+      quote: "Budgeting as innovative as Tesla, but way less expensive.",
+      name: "Elon Musk",
+      designation: "Entrepreneur",
+      src:  "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Elon_Musk_Royal_Society_crop.jpg/800px-Elon_Musk_Royal_Society_crop.jpg",
+    },
+    {
+      quote: "This app is proof the Earth revolves around budgets.",
+      name: "Galileo Galilei",
+      designation: "Astronomer",
+      src:  "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Galileo_Galilei_%281564-1642%29_RMG_BHC2700.tiff/lossy-page1-800px-Galileo_Galilei_%281564-1642%29_RMG_BHC2700.tiff.jpg",
+    },
+    {
+      quote: "This app made me rethink my philosophy about finances.",
+      name: "Socrates",
+      designation: "Philosopher",
+      src:  "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Socrate_du_Louvre.jpg/1200px-Socrate_du_Louvre.jpg",
+    },
+  ];
+
   const handleUpdateOverallBudget = async () => {
     if (!newBudget || newBudget <= 0) {
-      setErrorMessage('Please enter a valid budget greater than 0.');
+      setErrorMessage("Please enter a valid budget greater than 0.");
       return;
     }
 
     setIsUpdatingOverall(true);
-    setErrorMessage('');
-    setOverallSuccessMessage('');
+    setErrorMessage("");
+    setOverallSuccessMessage("");
 
     try {
-      const response = await fetch('http://localhost:5000/api/update-budget', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("http://localhost:5000/api/update-budget", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ monthlyBudget: newBudget }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        setErrorMessage(errorData.error || 'Failed to update budget.');
+        setErrorMessage(errorData.error || "Failed to update budget.");
         setIsUpdatingOverall(false);
         return;
       }
 
-      setOverallSuccessMessage('Overall budget updated successfully!');
+      setOverallSuccessMessage("Overall budget updated successfully!");
       await fetchUserData();
     } catch (error) {
-      console.error('Error updating overall budget:', error);
-      setErrorMessage('An error occurred while updating the overall budget.');
+      console.error("Error updating overall budget:", error);
+      setErrorMessage("An error occurred while updating the overall budget.");
     } finally {
       setIsUpdatingOverall(false);
     }
@@ -66,7 +95,7 @@ export default function BudgetsPage() {
   const handleUpdateCategoryBudgets = () => {
     setIsUpdatingCategories(true);
     setCategoryBudgets(localCategoryBudgets);
-    setCategorySuccessMessage('Category budgets updated successfully!');
+    setCategorySuccessMessage("Category budgets updated successfully!");
     setIsUpdatingCategories(false);
   };
 
@@ -77,114 +106,92 @@ export default function BudgetsPage() {
     }));
   };
 
-  const testimonials = [
-    {
-      quote: "I would recommend sofa.king budgeted to all of my friends. It is such a convenient tool to use!",
-      name: "Isaac Newton",
-      title: "Mathematician and Physicist",
-    },
-    {
-      quote: "The best budgeting tool since sliced bread. I use it to manage all my monthly expenses!",
-      name: "Abraham Lincoln",
-      title: "16th President of the United States",
-    },
-    {
-      quote: "Budgeting has never been easier. Truly revolutionary software!",
-      name: "Pythagoras",
-      title: "Philosopher and Mathematician",
-    },
-    {
-      quote: "Finally, a budget app as innovative as Tesla.",
-      name: "Elon Musk",
-      title: "Entrepreneur and Innovator",
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center p-6">
-      <h1 className="text-3xl font-bold mb-8">Modify Budgets</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen p-8 bg-black text-white">
+      <h1 className="text-3xl font-bold mb-6">Modify Budgets</h1>
 
-      <div className="flex flex-col lg:flex-row w-full max-w-5xl gap-8 mb-20">
-        {/* Overall Budget Card */}
+      <div className="flex flex-col lg:flex-row mb-20 max-w-7xl gap-4">
+        {/* Left Column: Overall Budget + Testimonials */}
         <div className="flex-1">
-          <Card className="bg-zinc-900 text-white">
-            <CardHeader>
-              <CardTitle>Overall Budget</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-lg text-zinc-400">
-                Your current budget is: <span className="text-yellow-500">${budgetTotal.toFixed(2)}</span>
+          {/* Overall Budget Form */}
+          <div className="border border-white rounded bg-black px-8 pt-6 pb-8 mb-8">
+            <h2 className="text-xl font-bold mb-4">Overall Budget</h2>
+            <p className="text-sm text-zinc-400 mb-4">
+              Current Budget:{" "}
+              <span className="text-yellow-500">${budgetTotal.toFixed(2)}</span>
+            </p>
+            <div className="mb-4">
+              <Label htmlFor="newBudget">Update Monthly Budget</Label>
+              <Input
+                id="newBudget"
+                type="number"
+                step="0.01"
+                placeholder="Enter new budget"
+                value={newBudget}
+                onChange={(e) => setNewBudget(parseFloat(e.target.value))}
+                className="bg-zinc-900 text-white"
+              />
+            </div>
+            {errorMessage && (
+              <p className="text-red-500 text-xs italic mb-4">{errorMessage}</p>
+            )}
+            {overallSuccessMessage && (
+              <p className="text-green-500 text-xs italic mb-4">
+                {overallSuccessMessage}
               </p>
-              <div className="mt-4">
-                <label className="block text-sm text-zinc-300 mb-2">Update Monthly Budget</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  placeholder="Enter new budget"
-                  value={newBudget}
-                  onChange={(e) => setNewBudget(parseFloat(e.target.value))}
-                  className="bg-zinc-800 text-white placeholder-zinc-500"
-                />
-              </div>
-              {errorMessage && <p className="text-red-500 text-sm mt-2">{errorMessage}</p>}
-              {overallSuccessMessage && (
-                <p className="text-green-500 text-sm mt-2">{overallSuccessMessage}</p>
-              )}
-              <Button
-                className="mt-4 bg-green-600 hover:bg-green-500 w-full"
-                onClick={handleUpdateOverallBudget}
-                disabled={isUpdatingOverall}
-              >
-                {isUpdatingOverall ? 'Updating Overall Budget...' : 'Update Overall Budget'}
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Infinite Moving Testimonials */}
-          <div className="mt-6 pt-8">
-            <InfiniteMovingCards
-              items={testimonials}
-              direction="left"
-              speed="slow"
-              pauseOnHover
-              className="max-w-md"
-            />
+            )}
+            <button
+              onClick={handleUpdateOverallBudget}
+              disabled={isUpdatingOverall}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+            >
+              {isUpdatingOverall
+                ? "Updating Overall Budget..."
+                : "Update Overall Budget"}
+            </button>
           </div>
+
+          {/* Animated Testimonials */}
+          <AnimatedTestimonials testimonials={testimonials} autoplay />
         </div>
 
-        {/* Category Budgets Card */}
-        <Card className="bg-zinc-900 text-white flex-1">
-          <CardHeader>
-            <CardTitle>Category Budgets</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {Object.entries(localCategoryBudgets).map(([category, budget]) => (
-              <div key={category} className="mb-4">
-                <p className="text-md text-zinc-400 capitalize">{category}</p>
-                <Input
-                  type="number"
-                  step="0.01"
-                  placeholder="Enter budget"
-                  value={budget}
-                  onChange={(e) => handleCategoryBudgetChange(category, parseFloat(e.target.value))}
-                  className="bg-zinc-800 text-white placeholder-zinc-500"
-                />
-              </div>
-            ))}
-            {categorySuccessMessage && (
-              <p className="text-green-500 text-sm mt-2">{categorySuccessMessage}</p>
-            )}
-            <Button
-              className="mt-4 bg-blue-600 hover:bg-blue-500 w-full"
-              onClick={handleUpdateCategoryBudgets}
-              disabled={isUpdatingCategories}
-            >
-              {isUpdatingCategories ? 'Updating Category Budgets...' : 'Update Category Budgets'}
-            </Button>
-          </CardContent>
-        </Card>
+        {/* Right Column: Category Budgets */}
+        <div className="flex-1 border border-white rounded bg-black px-8 pt-6 pb-8">
+          <h2 className="text-xl font-bold mb-4">Category Budgets</h2>
+          {Object.entries(localCategoryBudgets).map(([category, budget]) => (
+            <div key={category} className="mb-4">
+              <Label htmlFor={`budget-${category}`} className="capitalize">
+                {category}
+              </Label>
+              <Input
+                id={`budget-${category}`}
+                type="number"
+                step="0.01"
+                placeholder="Enter budget"
+                value={budget}
+                onChange={(e) =>
+                  handleCategoryBudgetChange(category, parseFloat(e.target.value))
+                }
+                className="bg-zinc-900 text-white"
+              />
+            </div>
+          ))}
+          {categorySuccessMessage && (
+            <p className="text-green-500 text-xs italic mb-4">
+              {categorySuccessMessage}
+            </p>
+          )}
+          <button
+            onClick={handleUpdateCategoryBudgets}
+            disabled={isUpdatingCategories}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+          >
+            {isUpdatingCategories
+              ? "Updating Category Budgets..."
+              : "Update Category Budgets"}
+          </button>
+        </div>
       </div>
-
       <FloatingDock />
     </div>
   );
