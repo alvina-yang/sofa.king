@@ -8,7 +8,7 @@ export default function HelpPage() {
     <div className="min-h-screen bg-black text-white flex flex-col items-center p-6">
       <h1 className="text-3xl font-bold mb-8">Help & Instructions</h1>
 
-      <div className="flex flex-col gap-6 mt-5 w-full max-w-4xl">
+      <div className="flex flex-col gap-6 w-full max-w-4xl">
         {/* Instruction: Modify Budgets */}
         <Card className="bg-zinc-900 text-white">
           <CardHeader>
@@ -44,6 +44,19 @@ export default function HelpPage() {
             <p className="text-sm text-zinc-400">
               The app dynamically creates categories based on your spending habits. All your purchases are logged and categorized automatically, 
               providing detailed insights and breakdowns.
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Instruction: Add Transactions */}
+        <Card className="bg-zinc-900 text-white">
+          <CardHeader>
+            <CardTitle className="text-xl">Add Transactions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-zinc-400">
+              You can add transactions easily through the Navbar. Look for the <span className="text-blue-500 font-semibold">Add Transaction</span> option 
+              and fill in the details like date, merchant, and amount.
             </p>
           </CardContent>
         </Card>

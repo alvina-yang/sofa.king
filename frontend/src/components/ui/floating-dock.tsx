@@ -38,16 +38,15 @@ const links = [
     href: "/budgets",
   },
   {
-    title: "Help",
-    icon: <IconHelp className="h-full w-full text-zinc-200 dark:text-zinc-300" />,
-    href: "/help",
-  },
-  // Add the new "Add Transaction" link
-  {
     title: "Add Transaction",
     icon: <IconPlus className="h-full w-full text-zinc-200 dark:text-zinc-300" />,
     href: "#",
-    isAction: true, // Indicate that this is an action, not a link
+    isAction: true, 
+  },
+  {
+    title: "Help",
+    icon: <IconHelp className="h-full w-full text-zinc-200 dark:text-zinc-300" />,
+    href: "/help",
   },
 ];
 
