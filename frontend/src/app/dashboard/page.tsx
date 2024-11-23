@@ -13,10 +13,10 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function Dashboard() {
   const {
-    budgetTotal,
-    budgetSpent,
-    categories,
-    goalMessage,
+    budgetTotal = 0, // Default value to prevent undefined errors
+    budgetSpent = 0, // Default value to prevent undefined errors
+    categories = {}, // Default value for categories
+    goalMessage = '', // Default empty string for goalMessage
     fetchUserData,
   } = useGlobalState();
 
@@ -75,10 +75,10 @@ export default function Dashboard() {
   }, []);
 
   // Calculate total for all categories
-  const totalCategorySpending = Object.values(categories).reduce(
+  const totalCategorySpending = Object.values(categories || {}).reduce(
     (acc, value) => acc + value,
     0
-  );
+  );  
 
   // Prepare data for the donut chart
   const categoryLabels = Object.keys(categories || {});

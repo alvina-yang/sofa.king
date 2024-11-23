@@ -1,9 +1,17 @@
 from langchain_ollama import OllamaLLM
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 import json
 import time
+from dotenv import load_dotenv  
+import os
+
+load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")
+
 def generate_insights(category, current_month_total, last_month_total, last_year_total, transactions, max_retries=3, delay=2):
-    llm = OllamaLLM(model="llama3.1")  
+    # llm = OllamaLLM(model="llama3.1")  
+    llm = ChatOpenAI(model="gpt-4o-mini", api_key=api_key)
 
     # Create a dynamic prompt that ensures comparisons make sense
     prompt = PromptTemplate(
@@ -49,13 +57,14 @@ def generate_insights(category, current_month_total, last_month_total, last_year
 
     for attempt in range(max_retries):
         try:
-            result = chain.invoke({
+            content = chain.invoke({
                 "category": category,
                 "current_month_total": current_month_total,
                 "last_month_total": last_month_total,
                 "last_year_total": last_year_total,
                 "transactions": json.dumps(transactions, indent=4)
             })
+            result = content.content
 
             # print(result)
             

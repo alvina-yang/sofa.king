@@ -4,9 +4,15 @@ from langchain_core.prompts import PromptTemplate
 from models import TransactionAnalysis 
 import json
 import time
+from dotenv import load_dotenv  
+from langchain_openai import ChatOpenAI
+import os
+
+load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")
 
 def process_transactions(transactions, max_retries=3, delay=2):
-    llm = OllamaLLM(model="llama3.1")  # This can be whatever 
+    llm = ChatOpenAI(model="gpt-4o-mini", api_key=api_key, temperature=0)  # This can be whatever 
     
     # Create the prompt template with format instructions
     prompt = PromptTemplate(
@@ -46,7 +52,8 @@ def process_transactions(transactions, max_retries=3, delay=2):
     
     for attempt in range(max_retries):
         try:
-            result = chain.invoke({"transactions": json.dumps(transactions, indent=4)})
+            content = chain.invoke({"transactions": json.dumps(transactions, indent=4)})
+            result = content.content
             
             # Extract JSON from the result
             start_index = result.index('{')

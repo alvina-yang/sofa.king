@@ -1,5 +1,11 @@
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
+from dotenv import load_dotenv  
+from langchain_openai import ChatOpenAI
+import os
+
+load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")
 
 def generate_goal_message(monthly_budget, total_amount, short_term_goal):
     # Calculate remaining amount
@@ -10,7 +16,8 @@ def generate_goal_message(monthly_budget, total_amount, short_term_goal):
         return "You've already exceeded your budget for this month."
 
     # Initialize the LLM model
-    llm = OllamaLLM(model="llama3.1")
+    # llm = OllamaLLM(model="llama3.1")
+    llm = ChatOpenAI(model="gpt-4o-mini", api_key=api_key)
 
     prompt_text = f"""
     Imagine the user has a goal: '{short_term_goal}'. Write a motivational and friendly message to encourage them.
@@ -28,7 +35,8 @@ def generate_goal_message(monthly_budget, total_amount, short_term_goal):
     """
 
     # Invoke the LLM with the generated prompt text
-    result = llm.invoke(prompt_text)
+    result_content = llm.invoke(prompt_text)
+    result = result_content.content
 
     # Return the generated message without any quotes or extra formatting
     return result.strip().replace('"', '')

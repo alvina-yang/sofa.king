@@ -145,6 +145,7 @@ def user_data_route():
         user_data['monthlyBudget'] = monthly_budget
         user_data['shortTermGoal'] = short_term_goal
         user_data['longTermGoal'] = long_term_goal
+        print(user_data)
 
         # Update user_data with current transactions
         update_user_data()

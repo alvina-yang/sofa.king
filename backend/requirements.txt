@@ -4,3 +4,5 @@ langchain-community
 flask
 flask-cors
 watchdog   
+langchain-openai
+python-dotenv
