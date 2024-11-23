@@ -215,6 +215,28 @@ def add_transaction():
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
+@app.route('/api/update-budget', methods=['POST'])
+def update_budget():
+    try:
+        # Parse the incoming JSON data
+        data = request.get_json()
+        new_budget = float(data.get("monthlyBudget", 0))
+
+        if new_budget <= 0:
+            return jsonify({"error": "Budget must be greater than 0"}), 400
+
+        user_data['monthlyBudget'] = new_budget
+
+        update_user_data()
+
+        global file_changed
+        file_changed = True
+
+        return jsonify({"message": "Budget updated successfully", **user_data}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route('/api/get-insights/<category>', methods=['GET'])
 def get_insights(category):
     try:
