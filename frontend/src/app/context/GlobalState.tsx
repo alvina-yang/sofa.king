@@ -32,6 +32,8 @@ interface GlobalState {
   setBudgetSpent: (value: number) => void;
   categories: { [key: string]: number };
   setCategories: (value: { [key: string]: number }) => void;
+  categoryBudgets: { [key: string]: number };
+  setCategoryBudgets: (value: { [key: string]: number }) => void;
   goalMessage: string;
   setGoalMessage: (value: string) => void;
   transactions: Transaction[];
@@ -43,7 +45,6 @@ interface GlobalState {
   fetchUserData: () => Promise<void>;
 }
 
-// Create default values for the context
 const defaultState: GlobalState = {
   budgetTotal: 0,
   setBudgetTotal: () => {},
@@ -51,6 +52,8 @@ const defaultState: GlobalState = {
   setBudgetSpent: () => {},
   categories: {},
   setCategories: () => {},
+  categoryBudgets: {},
+  setCategoryBudgets: () => {},
   goalMessage: '',
   setGoalMessage: () => {},
   transactions: [],
@@ -68,6 +71,13 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [budgetTotal, setBudgetTotal] = useState(0);
   const [budgetSpent, setBudgetSpent] = useState(0);
   const [categories, setCategories] = useState<{ [key: string]: number }>({});
+  const [categoryBudgets, setCategoryBudgets] = useState<{ [key: string]: number }>(() => {
+    const initialBudgets = Object.keys(categories).reduce((acc, category) => {
+      acc[category] = 50;
+      return acc;
+    }, {} as { [key: string]: number });
+    return initialBudgets;
+  });
   const [goalMessage, setGoalMessage] = useState('');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [subcategories, setSubcategories] = useState<{ [key: string]: DetailedCategory }>({});
@@ -79,7 +89,6 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
       if (!response.ok) throw new Error('Failed to fetch user data');
       const data = await response.json();
 
-      // Update global state
       setBudgetTotal(data.monthlyBudget || 0);
       setBudgetSpent(data.totalSpent || 0);
       setCategories(data.categories || {});
@@ -87,6 +96,17 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
       setTransactions(data.transactions || []);
       setSubcategories(data.subcategories || {});
       setInsights(data.insights || {});
+
+      // Sync categoryBudgets with fetched categories
+      setCategoryBudgets((prev) => {
+        const updatedBudgets = { ...prev };
+        Object.keys(data.categories || {}).forEach((category) => {
+          if (!(category in updatedBudgets)) {
+            updatedBudgets[category] = 50;
+          }
+        });
+        return updatedBudgets;
+      });
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -101,6 +121,8 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
         setBudgetSpent,
         categories,
         setCategories,
+        categoryBudgets,
+        setCategoryBudgets,
         goalMessage,
         setGoalMessage,
         transactions,

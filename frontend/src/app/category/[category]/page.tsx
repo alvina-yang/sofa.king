@@ -26,20 +26,24 @@ interface Insight {
 export default function CategoryPage() {
   const params = useParams();
   const category = typeof params?.category === 'string' ? params.category : undefined;
+
   const {
     categories,
     subcategories,
     setSubcategories,
     insights,
     setInsights,
+    categoryBudgets,
   } = useGlobalState();
+
   const [currentSubcategories, setCurrentSubcategories] = useState<DetailedCategory | null>(null);
   const [currentInsights, setCurrentInsights] = useState<Insight | null>(null);
   const [fileChanged, setFileChanged] = useState(false);
   const [spentPercentage, setSpentPercentage] = useState(0);
   const [subSpentPercentages, setSubSpentPercentages] = useState<{ [key: string]: number }>({});
 
-  const totalCategoryBudget = 50; // Default category budget
+  // Dynamically fetch the category budget
+  const totalCategoryBudget = categoryBudgets[category] || 50;
 
   // Fetch subcategories for the selected category
   useEffect(() => {
@@ -127,7 +131,7 @@ export default function CategoryPage() {
         setSubSpentPercentages(percentages);
       }
     }
-  }, [categories, currentSubcategories, category]);
+  }, [categories, currentSubcategories, category, totalCategoryBudget]);
 
   const amountSpent =
     category && categories[category] !== undefined ? categories[category].toFixed(2) : '0';

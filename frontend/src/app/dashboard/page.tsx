@@ -14,14 +14,9 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 export default function Dashboard() {
   const {
     budgetTotal,
-    setBudgetTotal,
     budgetSpent,
-    setBudgetSpent,
     categories,
-    setCategories,
     goalMessage,
-    setGoalMessage,
-    setTransactions,
     fetchUserData,
   } = useGlobalState();
 
