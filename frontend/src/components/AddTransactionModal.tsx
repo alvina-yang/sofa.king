@@ -40,6 +40,7 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ onClose }) =>
 
     // Send data to the backend
     try {
+      onClose();
       const response = await fetch("http://localhost:5000/api/add-transaction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -59,7 +60,7 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ onClose }) =>
       // Fetch updated data and close modal
       await fetchUserData();
       alert("Transaction added successfully!");
-      onClose();
+      
     } catch (error) {
       console.error("Error adding transaction:", error);
       alert("An error occurred while adding the transaction.");
