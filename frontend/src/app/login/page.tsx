@@ -1,6 +1,9 @@
 "use client"; // Ensure client-side execution
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Label } from "@/components/ui/label"; 
+import { Input } from "@/components/ui/input";
+import { BackgroundBeams } from "@/components/ui/background-beams";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -30,38 +33,30 @@ export default function Login() {
       <h1 className="text-3xl font-bold mb-6">Login to Sofa.King</h1>
       <form
         onSubmit={handleLogin}
-        className="bg-gray-800 shadow-md rounded px-8 pt-6 pb-8 w-full max-w-sm"
+        className="border border-white rounded z-10 bg-black px-8 pt-6 pb-8 w-full max-w-md"
       >
         <div className="mb-4">
-          <label
-            htmlFor="username"
-            className="block text-white text-sm font-bold mb-2"
-          >
-            Username
-          </label>
-          <input
+          <Label htmlFor="username">Username</Label>
+          <Input
             id="username"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-black bg-gray-200 leading-tight focus:outline-none focus:shadow-outline"
+            className="bg-zinc-900 text-white"
             placeholder="Enter your username"
+            required
           />
         </div>
         <div className="mb-6">
-          <label
-            htmlFor="password"
-            className="block text-white text-sm font-bold mb-2"
-          >
-            Password
-          </label>
-          <input
+          <Label htmlFor="password">Password</Label>
+          <Input
             id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-black bg-gray-200 leading-tight focus:outline-none focus:shadow-outline"
+            className="bg-zinc-900 text-white"
             placeholder="Enter your password"
+            required
           />
         </div>
         {error && (
@@ -70,12 +65,13 @@ export default function Login() {
         <div className="flex items-center justify-between">
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
           >
             Login
           </button>
         </div>
       </form>
+      <BackgroundBeams />
     </div>
   );
 }
