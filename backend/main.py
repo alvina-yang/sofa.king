@@ -186,23 +186,17 @@ def add_transaction():
         csv_file = 'data/transactions.csv'
         fieldnames = ['Date', 'Merchant', 'Amount']
 
-        # Check if the file exists and is not empty
-        file_exists = os.path.exists(csv_file) and os.path.getsize(csv_file) > 0
-
         with open(csv_file, mode='a', newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            
+
             # Write header only if the file is new or empty
-            if not file_exists:
+            if csvfile.tell() == 0:
                 writer.writeheader()
-            
-            # Ensure we're on a new line before writing
-            csvfile.seek(0, os.SEEK_END)
-            # if csvfile.tell() > 0:
-            #     csvfile.write('\n')
-            
+
+            # Write a new transaction row
             writer.writerow({'Date': date, 'Merchant': merchant, 'Amount': amount})
 
+        # Update user data to reflect the new transaction
         update_user_data()
 
         global file_changed
