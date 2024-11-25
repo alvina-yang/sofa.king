@@ -27,14 +27,14 @@
 
 ## Backend
 
-1. Add an OpenAI API Secret Key in the main directory as a .env file
-   ```
-   OPENAI_API_KEY=YOUR SECRET KEY HERE
-   ```
-
-2. Navigate to the backend directory:
+1. Navigate to the backend directory:
    ```bash
    cd backend
+   ```
+
+2. Add an OpenAI API Secret Key in the backend directory as a .env file
+   ```
+   OPENAI_API_KEY=YOUR SECRET KEY HERE
    ```
 
 3. Create a virtual environment:
