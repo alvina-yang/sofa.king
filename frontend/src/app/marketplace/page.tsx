@@ -27,71 +27,71 @@ export default function Marketplace() {
   const [equippedOptions, setEquippedOptions] = useState<number[]>([]);
   const [bodyType, setBodyType] = useState<"chest" | "breasts">("chest");
   const [skinTone, setSkinTone] = useState<AvatarProps["skinTone"]>("light");
-  const [openModal, setOpenModal] = useState<string | null>(null); 
+  const [openModal, setOpenModal] = useState<string | null>(null);
 
   const options: Option[] = [
     // Accessories
     { id: 1, name: "Shades", price: 25, type: "accessory", value: "shades" },
     { id: 2, name: "Round Glasses", price: 25, type: "accessory", value: "roundGlasses" },
     { id: 3, name: "Tiny Glasses", price: 25, type: "accessory", value: "tinyGlasses" },
-  
+
     // Clothing
     { id: 4, name: "Tank Top", price: 60, type: "clothing", value: "tankTop" },
     { id: 5, name: "Dress Shirt", price: 60, type: "clothing", value: "dressShirt" },
     { id: 6, name: "Shirt", price: 40, type: "clothing", value: "shirt" },
     { id: 7, name: "V-neck", price: 50, type: "clothing", value: "vneck" },
     { id: 8, name: "Dress", price: 100, type: "clothing", value: "dress" },
-  
+
     // Clothing Colors
     { id: 9, name: "White Clothes", price: 10, type: "clothingColor", value: "white" },
     { id: 10, name: "Blue Clothes", price: 10, type: "clothingColor", value: "blue" },
     { id: 11, name: "Black Clothes", price: 10, type: "clothingColor", value: "black" },
     { id: 12, name: "Green Clothes", price: 10, type: "clothingColor", value: "green" },
     { id: 13, name: "Red Clothes", price: 10, type: "clothingColor", value: "red" },
-  
+
     // Graphics
     { id: 14, name: "Vue Graphic", price: 100, type: "graphic", value: "vue" },
     { id: 15, name: "React Graphic", price: 50, type: "graphic", value: "react" },
     { id: 16, name: "Gatsby Graphic", price: 50, type: "graphic", value: "gatsby" },
     { id: 17, name: "Redwood Graphic", price: 50, type: "graphic", value: "redwood" },
-  
+
     // Hair
     { id: 18, name: "Short Hair", price: 40, type: "hair", value: "short" },
     { id: 19, name: "Afro Hair", price: 50, type: "hair", value: "afro" },
     { id: 20, name: "Long Hair", price: 40, type: "hair", value: "long" },
     { id: 21, name: "Pixie Hair", price: 40, type: "hair", value: "pixie" },
-  
+
     // Hair Colors
     { id: 22, name: "Blonde Hair", price: 30, type: "hairColor", value: "blonde" },
     { id: 23, name: "Black Hair", price: 30, type: "hairColor", value: "black" },
     { id: 24, name: "Brown Hair", price: 30, type: "hairColor", value: "brown" },
     { id: 25, name: "Blue Hair", price: 30, type: "hairColor", value: "blue" },
-  
+
     // Hats
     { id: 26, name: "Beanie Hat", price: 20, type: "hat", value: "beanie" },
     { id: 27, name: "Turban Hat", price: 20, type: "hat", value: "turban" },
-  
+
     // Hat Colors
     { id: 28, name: "White Hat", price: 10, type: "hatColor", value: "white" },
     { id: 29, name: "Black Hat", price: 10, type: "hatColor", value: "black" },
-  
+
     // Facial Hair
     { id: 30, name: "Beard", price: 30, type: "facialHair", value: "mediumBeard" },
     { id: 31, name: "Stubble", price: 20, type: "facialHair", value: "stubble" },
-  
+
     // Eyebrows
     { id: 32, name: "Raised Eyebrows", price: 5, type: "eyebrows", value: "raised" },
     { id: 33, name: "Angry Eyebrows", price: 5, type: "eyebrows", value: "angry" },
-  
+
     // Lips
     { id: 34, name: "Red Lips", price: 5, type: "lipColor", value: "red" },
     { id: 35, name: "Pink Lips", price: 5, type: "lipColor", value: "pink" },
-  
+
     // Mouth
     { id: 36, name: "Grin Mouth", price: 5, type: "mouth", value: "grin" },
     { id: 37, name: "Open Smile Mouth", price: 5, type: "mouth", value: "openSmile" },
   ];
-  
+
   // Grouping options into categories
   const categories: Category[] = [
     { name: "Accessories", options: options.filter((opt) => opt.type === "accessory") },
@@ -201,9 +201,8 @@ export default function Marketplace() {
             <button
               key={tone}
               onClick={() => handleSkinToneChange(tone as AvatarProps["skinTone"])}
-              className={`px-4 py-2 rounded-full font-bold ${
-                skinTone === tone ? "bg-green-600 text-white" : "bg-neutral-700 text-gray-300"
-              }`}
+              className={`px-4 py-2 rounded-full font-bold ${skinTone === tone ? "bg-green-600 text-white" : "bg-neutral-700 text-gray-300"
+                }`}
             >
               {tone.charAt(0).toUpperCase() + tone.slice(1)}
             </button>
@@ -216,9 +215,8 @@ export default function Marketplace() {
             <button
               key={body}
               onClick={() => handleBodyTypeChange(body as "chest" | "breasts")}
-              className={`px-4 py-2 rounded-full font-bold ${
-                bodyType === body ? "bg-green-600 text-white" : "bg-neutral-700 text-gray-300"
-              }`}
+              className={`px-4 py-2 rounded-full font-bold ${bodyType === body ? "bg-green-600 text-white" : "bg-neutral-700 text-gray-300"
+                }`}
             >
               {body === "chest" ? "Male" : "Female"}
             </button>
@@ -227,7 +225,7 @@ export default function Marketplace() {
       </div>
 
       {/* Categories */}
-      <section className="flex flex-col gap-4 w-full max-w-4xl">
+      <section className="grid grid-cols-3 gap-4 w-full max-w-4xl">
         {categories.map((category) => (
           <div key={category.name} className="flex flex-col gap-2">
             <button
@@ -248,7 +246,7 @@ export default function Marketplace() {
                       &times;
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     {category.options.map((option) => (
                       <div
                         key={option.id}
@@ -266,19 +264,18 @@ export default function Marketplace() {
                               handlePurchase(option.id, option.price);
                             }
                           }}
-                          className={`px-4 py-2 rounded-full text-sm font-bold ${
-                            equippedOptions.includes(option.id)
+                          className={`px-4 py-2 rounded-full text-sm font-bold ${equippedOptions.includes(option.id)
                               ? "bg-red-600 text-white hover:bg-red-700"
                               : purchasedOptions.includes(option.id)
-                              ? "bg-green-600 text-white hover:bg-green-700"
-                              : "bg-blue-600 text-white hover:bg-blue-700"
-                          }`}
+                                ? "bg-green-600 text-white hover:bg-green-700"
+                                : "bg-blue-600 text-white hover:bg-blue-700"
+                            }`}
                         >
                           {equippedOptions.includes(option.id)
                             ? "Unequip"
                             : purchasedOptions.includes(option.id)
-                            ? "Equip"
-                            : "Buy"}
+                              ? "Equip"
+                              : "Buy"}
                         </button>
                       </div>
                     ))}
@@ -289,6 +286,7 @@ export default function Marketplace() {
           </div>
         ))}
       </section>
+
       {/* Floating Dock */}
       <div className="mt-6 mb-2">
         <FloatingDock />
