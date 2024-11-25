@@ -27,17 +27,22 @@
 
 ## Backend
 
-1. Navigate to the backend directory:
+1. Add an OpenAI API Secret Key in the main directory as a .env file
+   ```
+   OPENAI_API_KEY=YOUR SECRET KEY HERE
+   ```
+
+2. Navigate to the backend directory:
    ```bash
    cd backend
    ```
 
-2. Create a virtual environment:
+3. Create a virtual environment:
    ```bash
    python -m venv venv
    ```
 
-3. Activate the virtual environment:
+4. Activate the virtual environment:
    - On Windows:
      ```bash
      venv\Scripts\activate
@@ -47,25 +52,12 @@
      source venv/bin/activate
      ```
 
-4. Install the required packages:
+5. Install the required packages:
    ```bash
    pip install -r requirements.txt
    ```
 
-5. Install Ollama:
-   Follow the instructions at [Ollama's official website](https://ollama.ai/download) to install Ollama for your operating system.
-
-6. Pull the Llama 3.1 model:
-   ```bash
-   ollama pull llama3.1
-   ```
-
-7. Start the Ollama server:
-   ```bash
-   ollama serve
-   ```
-
-8. Run the Python backend:
+6. Run the Python backend:
    ```bash
    python main.py
    ```
