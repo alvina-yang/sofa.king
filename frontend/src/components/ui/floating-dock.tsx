@@ -6,7 +6,8 @@ import {
   IconWallet,
   IconCash,
   IconHelp,
-  IconPlus, // Import Plus Icon
+  IconPlus,
+  IconShoppingBag, 
 } from "@tabler/icons-react";
 import {
   AnimatePresence,
@@ -36,6 +37,11 @@ const links = [
     title: "Budgets",
     icon: <IconCash className="h-full w-full text-zinc-200 dark:text-zinc-300" />,
     href: "/budgets",
+  },
+  {
+    title: "Marketplace",
+    icon: <IconShoppingBag className="h-full w-full text-zinc-200 dark:text-zinc-300" />,
+    href: "/marketplace",
   },
   {
     title: "Add Transaction",
