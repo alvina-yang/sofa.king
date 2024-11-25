@@ -11,6 +11,7 @@ load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 
 def process_detailed_transactions(transactions, max_retries=3, delay=2):
+    # llm = OllamaLLM(model="llama3.1") 
     llm = ChatOpenAI(model="gpt-4o-mini", api_key=api_key, temperature=0)
     
     # Create the prompt template with format instructions
@@ -70,7 +71,7 @@ def process_detailed_transactions(transactions, max_retries=3, delay=2):
         try:
             content = chain.invoke({"transactions": json.dumps(transactions, indent=4)})
             result = content.content
-            
+
             # Extract JSON from the result
             start_index = result.index('{')
             end_index = result.rindex('}') + 1
