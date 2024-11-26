@@ -1,6 +1,11 @@
 
 # sofa.king
 
+## Requirements
+
+- Python version: > 3.9
+- Node.js version: > 20
+
 # Project Setup
 
 ## Frontend
